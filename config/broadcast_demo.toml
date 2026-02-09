@@ -1,0 +1,62 @@
+# Broadcast channel demo.
+#
+# Topology:
+#
+#   [events] ──broadcast──┬──► [tagger] ──broadcast──┬──► [console]
+#              (500ms)     │                          └──► [archive]
+#                          └──► [sampler] ────────────────► [console]
+#
+#   [metrics] ─────────────────► [archive]
+#              (2000ms)
+#
+# Broadcast channels are created automatically:
+#   • "events"  → referenced by both "tagger" and "sampler"
+#   • "tagger"  → referenced by both "console" and "archive"
+#
+# "console" merges messages from "tagger" and "sampler".
+# "archive" merges messages from "tagger" and "metrics".
+
+[[service]]
+name = "broadcast-demo"
+channel_capacity = 256
+
+  # ── Sources ────────────────────────────────────────────────────
+
+  [[service.source]]
+  type = "interval"
+  name = "events"
+    [service.source.settings]
+    interval_ms = 500
+
+  [[service.source]]
+  type = "interval"
+  name = "metrics"
+    [service.source.settings]
+    interval_ms = 2000
+
+  # ── Processors ─────────────────────────────────────────────────
+
+  # Both processors receive from "events" → broadcast
+  [[service.processor]]
+  type = "passthrough"
+  name = "tagger"
+  from = ["events"]
+
+  [[service.processor]]
+  type = "passthrough"
+  name = "sampler"
+  from = ["events"]
+
+  # ── Sinks ──────────────────────────────────────────────────────
+
+  # Merges output from tagger + sampler
+  [[service.sink]]
+  type = "log"
+  name = "console"
+  from = ["tagger", "sampler"]
+
+  # Merges output from tagger + metrics (tagger is broadcast)
+  [[service.sink]]
+  type = "log"
+  name = "archive"
+  from = ["tagger", "metrics"]

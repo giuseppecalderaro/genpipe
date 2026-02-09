@@ -1,0 +1,45 @@
+# Example Helix pipeline configuration.
+#
+# Each processor and sink declares a `from` list naming its predecessors.
+# When multiple components reference the same predecessor, the runtime
+# automatically uses a broadcast channel.
+#
+# This file describes two services that run concurrently:
+#
+# 1. "heartbeat" — emits a tick every second; both sinks receive via broadcast.
+# 2. "fast-ticker" — emits every 500ms and logs to "debug".
+
+[[service]]
+name = "heartbeat"
+
+  [[service.source]]
+  type = "interval"
+  name = "tick"
+    [service.source.settings]
+    interval_ms = 1000
+
+  # Two sinks reference the same source → broadcast channel
+  [[service.sink]]
+  type = "log"
+  name = "console"
+  from = ["tick"]
+
+  [[service.sink]]
+  type = "log"
+  name = "backup"
+  from = ["tick"]
+
+[[service]]
+name = "fast-ticker"
+channel_capacity = 512
+
+  [[service.source]]
+  type = "interval"
+  name = "fast"
+    [service.source.settings]
+    interval_ms = 500
+
+  [[service.sink]]
+  type = "log"
+  name = "debug"
+  from = ["fast"]
