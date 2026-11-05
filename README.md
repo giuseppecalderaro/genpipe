@@ -282,36 +282,38 @@ registry.register_source("my_source", |cfg| {
 ```
 genpipe/
 ├── Cargo.toml
+├── LICENSE
+├── README.md
 ├── config/
 │   ├── pipeline.toml            # Default pipeline config
 │   └── broadcast_demo.toml      # Multi-source broadcast example
 ├── examples/
 │   ├── basic_pipeline.rs        # Code-first multi-service example
 │   └── config_pipeline.rs       # Config-driven example
-└── src/
-    ├── bin/
-    │   └── runner.rs            # CLI binary (clap)
-    ├── lib.rs                   # Library root + prelude
-    ├── message.rs               # Message, Payload, Encoding
-    ├── error.rs                 # Error enum
-    ├── config.rs                # TOML config parsing
-    ├── registry.rs              # Component factory registry
-    ├── runner.rs                # ServiceRunner
-    ├── service.rs               # Service, ServiceBuilder, DAG validation
-    ├── wiring.rs                # Channel graph construction (internal)
-    ├── runtime.rs               # Per-component task runners with drain & retry (internal)
-    └── components/
-        ├── mod.rs               # Source, Processor, Sink traits
-        ├── nats_auth.rs         # NatsAuth, URL redaction
-        ├── sources.rs           # IntervalSource, FnSource, IterSource, NatsSource
-        ├── processors.rs        # MapProcessor, FilterProcessor, FnProcessor
-        └── sinks.rs             # LogSink, FnSink, AsyncFnSink, CollectorSink, NatsSink
-├── tests/
-│   └── dag_wiring.rs            # Integration tests for DAG topology & validation
+├── src/
+│   ├── bin/
+│   │   └── runner.rs            # CLI binary (clap)
+│   ├── lib.rs                   # Library root + prelude
+│   ├── message.rs               # Message, Payload, Encoding
+│   ├── error.rs                 # Error enum
+│   ├── config.rs                # TOML config parsing
+│   ├── registry.rs              # Component factory registry
+│   ├── runner.rs                # ServiceRunner
+│   ├── service.rs               # Service, ServiceBuilder, DAG validation
+│   ├── wiring.rs                # Channel graph construction (internal)
+│   ├── runtime.rs               # Per-component task runners with drain & retry (internal)
+│   └── components/
+│       ├── mod.rs               # Source, Processor, Sink traits
+│       ├── nats_auth.rs         # NatsAuth, URL redaction
+│       ├── sources.rs           # IntervalSource, FnSource, IterSource, NatsSource
+│       ├── processors.rs        # MapProcessor, FilterProcessor, FnProcessor
+│       └── sinks.rs             # LogSink, FnSink, AsyncFnSink, CollectorSink, NatsSink
+└── tests/
+    └── dag_wiring.rs            # Integration tests for DAG topology & validation
 ```
 
 ---
 
 ## License
 
-Unlicensed — add your preferred license here.
+Licensed under the [MIT License](LICENSE).
