@@ -1,0 +1,7 @@
+/target
+
+# Local secrets
+.env
+.env.*
+*.creds
+*.nk

@@ -176,6 +176,7 @@ mod nats_sink {
     use tracing::info;
 
     use crate::components::Sink;
+    use crate::components::nats_auth::{self, NatsAuth, redact_url};
     use crate::error::Error;
     use crate::message::Payload;
     use crate::{Message, Result};
@@ -200,11 +201,17 @@ mod nats_sink {
     ///   [service.sink.settings]
     ///   url = "nats://localhost:4222"
     ///   subject = "output.processed"
+    ///   # Optional auth — secrets are read from env vars, never inline:
+    ///   # user = "publisher"
+    ///   # password_env = "NATS_PASSWORD"
     /// ```
+    ///
+    /// See [`NatsAuth::from_settings`] for all authentication settings.
     pub struct NatsSink {
         name: String,
         url: String,
         subject: String,
+        auth: NatsAuth,
         client: OnceCell<async_nats::Client>,
     }
 
@@ -218,21 +225,26 @@ mod nats_sink {
                 name: name.into(),
                 url: url.into(),
                 subject: subject.into(),
+                auth: NatsAuth::None,
                 client: OnceCell::new(),
             }
+        }
+
+        /// Set the authentication method used when connecting.
+        pub fn with_auth(mut self, auth: NatsAuth) -> Self {
+            self.auth = auth;
+            self
         }
 
         /// Lazy-connect on first message so that construction is infallible.
         async fn client(&self) -> Result<&async_nats::Client> {
             self.client
                 .get_or_try_init(|| async {
-                    let c = async_nats::connect(&self.url)
-                        .await
-                        .map_err(|e| Error::Nats(format!("connect to {}: {e}", self.url)))?;
+                    let c = nats_auth::connect(&self.url, &self.auth).await?;
 
                     info!(
                         sink = %self.name,
-                        url = %self.url,
+                        url = %redact_url(&self.url),
                         subject = %self.subject,
                         "nats sink connected"
                     );

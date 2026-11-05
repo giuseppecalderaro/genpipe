@@ -72,10 +72,10 @@ impl ComponentRegistry {
     /// | Kind      | Type key       | Settings |
     /// |-----------|----------------|----------|
     /// | source    | `interval`     | `interval_ms` (u64, default 1000) |
-    /// | source    | `nats`         | `url` (default `nats://localhost:4222`), `subject` (required) |
+    /// | source    | `nats`         | `url` (default `nats://localhost:4222`), `subject` (required), auth settings (see [`NatsAuth::from_settings`](crate::components::nats_auth::NatsAuth::from_settings)) |
     /// | processor | `passthrough`  | — |
     /// | sink      | `log`          | — |
-    /// | sink      | `nats`         | `url` (default `nats://localhost:4222`), `subject` (required) |
+    /// | sink      | `nats`         | `url` (default `nats://localhost:4222`), `subject` (required), auth settings (see [`NatsAuth::from_settings`](crate::components::nats_auth::NatsAuth::from_settings)) |
     pub fn with_builtins() -> Self {
         let mut reg = Self::new();
         register_builtins(&mut reg);
@@ -178,6 +178,25 @@ impl Default for ComponentRegistry {
 
 // ── Built-in registrations ──────────────────────────────────────────────
 
+/// Resolve NATS auth for a config-built component and warn (without
+/// revealing the secret) when credentials are embedded in the URL.
+fn nats_auth_from_config(
+    cfg: &ComponentConfig,
+    url: &str,
+) -> Result<crate::components::nats_auth::NatsAuth> {
+    use crate::components::nats_auth::{NatsAuth, redact_url, url_has_credentials};
+
+    if url_has_credentials(url) {
+        tracing::warn!(
+            component = %cfg.resolved_name(),
+            url = %redact_url(url),
+            "nats url contains credentials; prefer `token_env`, `user`/`password_env`, \
+             `nkey_seed_env` or `credentials_file` so secrets stay out of config files"
+        );
+    }
+    NatsAuth::from_settings(cfg)
+}
+
 fn register_builtins(reg: &mut ComponentRegistry) {
     use crate::components::processors::MapProcessor;
     use crate::components::sinks::{LogSink, NatsSink};
@@ -204,7 +223,8 @@ fn register_builtins(reg: &mut ComponentRegistry) {
                 crate::error::Error::Config("nats source requires a `subject` setting".into())
             })?
             .to_owned();
-        Ok(Box::new(NatsSource::new(name, url, subject)))
+        let auth = nats_auth_from_config(cfg, &url)?;
+        Ok(Box::new(NatsSource::new(name, url, subject).with_auth(auth)))
     });
 
     // ── Processors ──────────────────────────────────────────────────
@@ -232,7 +252,8 @@ fn register_builtins(reg: &mut ComponentRegistry) {
                 crate::error::Error::Config("nats sink requires a `subject` setting".into())
             })?
             .to_owned();
-        Ok(Box::new(NatsSink::new(name, url, subject)))
+        let auth = nats_auth_from_config(cfg, &url)?;
+        Ok(Box::new(NatsSink::new(name, url, subject).with_auth(auth)))
     });
 }
 
@@ -276,6 +297,25 @@ mod tests {
         };
         let source = reg.create_source(&cfg).expect("should create interval source");
         assert_eq!(source.name(), "tick");
+    }
+
+    #[test]
+    fn nats_rejects_inline_password() {
+        let reg = ComponentRegistry::with_builtins();
+        let cfg = ComponentConfig {
+            component_type: "nats".into(),
+            name: Some("pub".into()),
+            from: Vec::new(),
+            settings: [
+                ("subject".into(), serde_json::json!("out")),
+                ("password".into(), serde_json::json!("hunter2")),
+            ]
+            .into_iter()
+            .collect(),
+        };
+        let err = reg.create_sink(&cfg).err().expect("inline password must be rejected");
+        assert!(!err.to_string().contains("hunter2"));
+        assert!(reg.create_source(&cfg).is_err());
     }
 
     #[test]

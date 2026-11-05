@@ -5,6 +5,7 @@
 //! ready-made implementations in the [`sources`], [`processors`], and
 //! [`sinks`] sub-modules.
 
+pub mod nats_auth;
 pub mod processors;
 pub mod sinks;
 pub mod sources;

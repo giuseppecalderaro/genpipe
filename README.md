@@ -112,7 +112,7 @@ Payload variants: `Json(Value)`, `Text(String)`, `Bytes(bytes::Bytes)`, `Empty`.
 | Type key | Struct | Description |
 |----------|--------|-------------|
 | `interval` | `IntervalSource` | Emits numbered JSON messages at a fixed interval. Settings: `interval_ms`. |
-| `nats` | `NatsSource` | Subscribes to a NATS subject with exponential-backoff reconnect. Settings: `url`, `subject`. |
+| `nats` | `NatsSource` | Subscribes to a NATS subject with exponential-backoff reconnect. Settings: `url`, `subject`, plus [auth](#nats-authentication). |
 | — | `IterSource` | Emits a fixed list of messages (useful for tests). |
 | — | `FnSource` | Wraps an async closure as a source. |
 
@@ -130,10 +130,33 @@ Payload variants: `Json(Value)`, `Text(String)`, `Bytes(bytes::Bytes)`, `Empty`.
 | Type key | Struct | Description |
 |----------|--------|-------------|
 | `log` | `LogSink` | Logs via `tracing::info`. |
-| `nats` | `NatsSink` | Publishes to a NATS subject; flushes on shutdown. Settings: `url`, `subject`. |
+| `nats` | `NatsSink` | Publishes to a NATS subject; flushes on shutdown. Settings: `url`, `subject`, plus [auth](#nats-authentication). |
 | — | `FnSink` | Synchronous closure sink. |
 | — | `AsyncFnSink` | Async closure sink. |
 | — | `CollectorSink` | Collects messages into a `Vec` (for testing). |
+
+### NATS authentication
+
+Secrets are never written in the config file. The `nats` source and sink read them from environment variables, or from a `.creds` file path. Configure at most one method:
+
+| Settings | Method |
+|----------|--------|
+| `user` + `password_env` | Username (inline) and the name of the env var holding the password |
+| `token_env` | Name of the env var holding the token |
+| `nkey_seed_env` | Name of the env var holding the NKey seed |
+| `credentials_file` | Path to a NATS `.creds` file (JWT + NKey) |
+
+```toml
+[[service.sink]]
+type = "nats"
+name = "publisher"
+  [service.sink.settings]
+  url = "nats://nats.internal:4222"
+  subject = "output.processed"
+  token_env = "NATS_TOKEN"
+```
+
+Inline secret settings (`password`, `token`, `nkey`, `nkey_seed`, `seed`, `credentials`) are rejected at startup. Credentials embedded in the URL (`nats://user:pass@host`) still work, but they trigger a warning. URLs are always redacted (`nats://user:***@host`) in logs and error messages. In code, use `NatsSource::new(..).with_auth(NatsAuth::Token(..))`.
 
 ---
 
@@ -279,6 +302,7 @@ genpipe/
     ├── runtime.rs               # Per-component task runners with drain & retry (internal)
     └── components/
         ├── mod.rs               # Source, Processor, Sink traits
+        ├── nats_auth.rs         # NatsAuth, URL redaction
         ├── sources.rs           # IntervalSource, FnSource, IterSource, NatsSource
         ├── processors.rs        # MapProcessor, FilterProcessor, FnProcessor
         └── sinks.rs             # LogSink, FnSink, AsyncFnSink, CollectorSink, NatsSink

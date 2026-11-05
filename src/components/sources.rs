@@ -161,6 +161,7 @@ mod nats_source {
     use tracing::{error, info, warn};
 
     use crate::components::Source;
+    use crate::components::nats_auth::{self, NatsAuth, redact_url};
     use crate::error::Error;
     use crate::message::Payload;
     use crate::{Message, Result};
@@ -184,11 +185,16 @@ mod nats_source {
     ///   [service.source.settings]
     ///   url = "nats://localhost:4222"
     ///   subject = "events.>"
+    ///   # Optional auth — secrets are read from env vars, never inline:
+    ///   # token_env = "NATS_TOKEN"
     /// ```
+    ///
+    /// See [`NatsAuth::from_settings`] for all authentication settings.
     pub struct NatsSource {
         name: String,
         url: String,
         subject: String,
+        auth: NatsAuth,
     }
 
     impl NatsSource {
@@ -201,7 +207,14 @@ mod nats_source {
                 name: name.into(),
                 url: url.into(),
                 subject: subject.into(),
+                auth: NatsAuth::None,
             }
+        }
+
+        /// Set the authentication method used when connecting.
+        pub fn with_auth(mut self, auth: NatsAuth) -> Self {
+            self.auth = auth;
+            self
         }
     }
 
@@ -222,12 +235,12 @@ mod nats_source {
                 let max_delay = Duration::from_secs(60);
 
                 loop {
-                    match async_nats::connect(&self.url).await {
+                    match nats_auth::connect(&self.url, &self.auth).await {
                         Ok(c) => break c,
                         Err(e) => {
                             warn!(
                                 source = %self.name,
-                                url = %self.url,
+                                url = %redact_url(&self.url),
                                 error = %e,
                                 retry_in = ?delay,
                                 "nats connect failed, retrying"
@@ -250,7 +263,7 @@ mod nats_source {
 
             info!(
                 source = %self.name,
-                url = %self.url,
+                url = %redact_url(&self.url),
                 subject = %self.subject,
                 "nats source connected"
             );
