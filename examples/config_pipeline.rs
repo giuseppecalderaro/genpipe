@@ -9,10 +9,10 @@
 
 use std::time::Duration;
 
-use helix::prelude::*;
+use genpipe::prelude::*;
 
 #[tokio::main]
-async fn main() -> helix::Result<()> {
+async fn main() -> genpipe::Result<()> {
     tracing_subscriber::fmt()
         .with_target(false)
         .with_level(true)

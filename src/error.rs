@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-/// Errors that can occur within the Helix pipeline framework.
+/// Errors that can occur within the Genpipe pipeline framework.
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("channel send failed: {0}")]
@@ -43,5 +43,5 @@ pub enum Error {
     Other(#[from] Box<dyn std::error::Error + Send + Sync>),
 }
 
-/// A convenience alias for `Result<T, helix::Error>`.
+/// A convenience alias for `Result<T, genpipe::Error>`.
 pub type Result<T> = std::result::Result<T, Error>;

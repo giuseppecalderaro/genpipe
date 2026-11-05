@@ -1,4 +1,4 @@
-//! # Helix
+//! # Genpipe
 //!
 //! A framework for building **pipelined services** on top of [Tokio](https://tokio.rs).
 //!
@@ -14,12 +14,12 @@
 //! ## Quick start
 //!
 //! ```rust,ignore
-//! use helix::prelude::*;
-//! use helix::components::{sources::IntervalSource, sinks::LogSink};
+//! use genpipe::prelude::*;
+//! use genpipe::components::{sources::IntervalSource, sinks::LogSink};
 //! use std::time::Duration;
 //!
 //! #[tokio::main]
-//! async fn main() -> helix::Result<()> {
+//! async fn main() -> genpipe::Result<()> {
 //!     let shutdown = CancellationToken::new();
 //!
 //!     let service = Service::builder("heartbeat-logger")
@@ -65,7 +65,7 @@ pub use service::{Service, ServiceBuilder};
 /// A boxed, `Send`-able future — used by closure-based components.
 pub type BoxFuture<'a, T> = std::pin::Pin<Box<dyn std::future::Future<Output = T> + Send + 'a>>;
 
-/// Convenience prelude — `use helix::prelude::*` to get started quickly.
+/// Convenience prelude — `use genpipe::prelude::*` to get started quickly.
 pub mod prelude {
     pub use crate::components;
     pub use crate::config::{ComponentConfig, ErrorStrategy, PipelineConfig, ServiceConfig};

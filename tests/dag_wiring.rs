@@ -1,9 +1,9 @@
 //! Integration tests for DAG wiring, validation, and topology variations.
 
-use helix::components::processors::{FilterProcessor, MapProcessor};
-use helix::components::sinks::CollectorSink;
-use helix::components::sources::IterSource;
-use helix::prelude::*;
+use genpipe::components::processors::{FilterProcessor, MapProcessor};
+use genpipe::components::sinks::CollectorSink;
+use genpipe::components::sources::IterSource;
+use genpipe::prelude::*;
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 

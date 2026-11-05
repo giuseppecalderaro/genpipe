@@ -6,11 +6,11 @@ use crate::{Message, Result};
 /// Transforms each message using a synchronous closure.
 ///
 /// ```rust,ignore
-/// use helix::components::processors::MapProcessor;
+/// use genpipe::components::processors::MapProcessor;
 ///
 /// let upper = MapProcessor::new("uppercase", |mut msg| {
 ///     if let Some(text) = msg.payload().as_text() {
-///         msg.set_payload(helix::Payload::Text(text.to_uppercase()));
+///         msg.set_payload(genpipe::Payload::Text(text.to_uppercase()));
 ///     }
 ///     msg
 /// });
@@ -52,7 +52,7 @@ where
 /// Drops messages that do not match a predicate.
 ///
 /// ```rust,ignore
-/// use helix::components::processors::FilterProcessor;
+/// use genpipe::components::processors::FilterProcessor;
 ///
 /// let only_text = FilterProcessor::new("text-only", |msg| {
 ///     msg.payload().as_text().is_some()
@@ -100,8 +100,8 @@ where
 /// [`ProcessorOutput`].
 ///
 /// ```rust,ignore
-/// use helix::components::processors::FnProcessor;
-/// use helix::ProcessorOutput;
+/// use genpipe::components::processors::FnProcessor;
+/// use genpipe::ProcessorOutput;
 ///
 /// let enricher = FnProcessor::new("enrich", |msg| Box::pin(async move {
 ///     // … async enrichment logic …

@@ -1,11 +1,11 @@
 [package]
-name = "helix"
+name = "genpipe"
 version = "0.1.0"
 edition = "2024"
 description = "A framework for building pipelined services with sources, processors, and sinks"
 
 [[bin]]
-name = "helix"
+name = "genpipe"
 path = "src/bin/runner.rs"
 
 [dependencies]

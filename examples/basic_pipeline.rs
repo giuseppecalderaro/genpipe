@@ -8,10 +8,10 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
-use helix::prelude::*;
-use helix::components::processors::{FilterProcessor, MapProcessor};
-use helix::components::sinks::LogSink;
-use helix::components::sources::IntervalSource;
+use genpipe::prelude::*;
+use genpipe::components::processors::{FilterProcessor, MapProcessor};
+use genpipe::components::sinks::LogSink;
+use genpipe::components::sources::IntervalSource;
 
 // ── Custom source ───────────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ impl Source for CounterSource {
             }
             tx.send(msg)
                 .await
-                .map_err(|e| helix::Error::ChannelSend(e.to_string()))?;
+                .map_err(|e| genpipe::Error::ChannelSend(e.to_string()))?;
         }
         Ok(())
     }
@@ -92,7 +92,7 @@ impl Sink for CountingSink {
 // ── main ────────────────────────────────────────────────────────────────
 
 #[tokio::main]
-async fn main() -> helix::Result<()> {
+async fn main() -> genpipe::Result<()> {
     // Initialise tracing (optional but recommended).
     tracing_subscriber::fmt()
         .with_target(false)

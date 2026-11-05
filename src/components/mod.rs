@@ -27,7 +27,7 @@ use crate::{Message, Result};
 ///
 /// ```rust,ignore
 /// use async_trait::async_trait;
-/// use helix::prelude::*;
+/// use genpipe::prelude::*;
 ///
 /// struct TickSource;
 ///
@@ -46,7 +46,7 @@ use crate::{Message, Result};
 ///                 _ = shutdown.cancelled() => break,
 ///                 _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
 ///                     let msg = Message::text("tick", i.to_string());
-///                     tx.send(msg).await.map_err(|e| helix::Error::ChannelSend(e.to_string()))?;
+///                     tx.send(msg).await.map_err(|e| genpipe::Error::ChannelSend(e.to_string()))?;
 ///                     i += 1;
 ///                 }
 ///             }
@@ -93,7 +93,7 @@ pub enum ProcessorOutput {
 ///
 /// ```rust,ignore
 /// use async_trait::async_trait;
-/// use helix::prelude::*;
+/// use genpipe::prelude::*;
 ///
 /// struct UpperCase;
 ///
@@ -130,7 +130,7 @@ pub trait Processor: Send + Sync {
 ///
 /// ```rust,ignore
 /// use async_trait::async_trait;
-/// use helix::prelude::*;
+/// use genpipe::prelude::*;
 ///
 /// struct PrintSink;
 ///

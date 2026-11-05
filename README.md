@@ -1,4 +1,4 @@
-# Helix
+# Genpipe
 
 A Rust framework for building **pipelined services** on top of [Tokio](https://tokio.rs).
 
@@ -11,7 +11,7 @@ Assemble directed graphs of **sources**, **processors**, and **sinks** connected
                                                     └──► [Sink N]
 ```
 
-When multiple downstream components reference the same upstream node, Helix automatically creates a **broadcast channel** so every consumer receives a copy.
+When multiple downstream components reference the same upstream node, Genpipe automatically creates a **broadcast channel** so every consumer receives a copy.
 
 ### Key features
 
@@ -29,12 +29,12 @@ When multiple downstream components reference the same upstream node, Helix auto
 ### Code-first (builder API)
 
 ```rust
-use helix::prelude::*;
-use helix::components::{sources::IntervalSource, sinks::LogSink};
+use genpipe::prelude::*;
+use genpipe::components::{sources::IntervalSource, sinks::LogSink};
 use std::time::Duration;
 
 #[tokio::main]
-async fn main() -> helix::Result<()> {
+async fn main() -> genpipe::Result<()> {
     let shutdown = CancellationToken::new();
 
     let service = Service::builder("heartbeat")
@@ -217,7 +217,7 @@ Shutdown: press **Ctrl-C** — the runner cancels a `CancellationToken` that pro
 ### Custom source
 
 ```rust
-use helix::prelude::*;
+use genpipe::prelude::*;
 
 struct MySource { name: String }
 
@@ -257,7 +257,7 @@ registry.register_source("my_source", |cfg| {
 ## Project structure
 
 ```
-helix/
+genpipe/
 ├── Cargo.toml
 ├── config/
 │   ├── pipeline.toml            # Default pipeline config

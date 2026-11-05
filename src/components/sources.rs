@@ -17,7 +17,7 @@ pub use nats_source::NatsSource;
 /// Useful for heartbeats, testing, and driving time-based pipelines.
 ///
 /// ```rust,ignore
-/// use helix::components::sources::IntervalSource;
+/// use genpipe::components::sources::IntervalSource;
 /// use std::time::Duration;
 ///
 /// let ticker = IntervalSource::new("heartbeat", Duration::from_secs(5));
@@ -70,7 +70,7 @@ impl Source for IntervalSource {
 /// Wraps an async closure as a [`Source`].
 ///
 /// ```rust,ignore
-/// use helix::components::sources::FnSource;
+/// use genpipe::components::sources::FnSource;
 ///
 /// let src = FnSource::new("custom", |tx, shutdown| Box::pin(async move {
 ///     tx.send(Message::text("custom", "hello")).await.ok();

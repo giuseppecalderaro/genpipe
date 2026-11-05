@@ -39,8 +39,8 @@
 //! ## Usage
 //!
 //! ```rust,ignore
-//! use helix::config::PipelineConfig;
-//! use helix::registry::ComponentRegistry;
+//! use genpipe::config::PipelineConfig;
+//! use genpipe::registry::ComponentRegistry;
 //!
 //! let cfg = PipelineConfig::from_file("pipeline.toml")?;
 //! let registry = ComponentRegistry::new();

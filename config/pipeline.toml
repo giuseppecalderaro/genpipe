@@ -1,4 +1,4 @@
-# Example Helix pipeline configuration.
+# Example Genpipe pipeline configuration.
 #
 # Each processor and sink declares a `from` list naming its predecessors.
 # When multiple components reference the same predecessor, the runtime

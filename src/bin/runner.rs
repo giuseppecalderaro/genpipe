@@ -5,12 +5,12 @@ use clap::Parser;
 use tokio_util::sync::CancellationToken;
 use tracing::{error, info};
 
-use helix::config::PipelineConfig;
-use helix::registry::ComponentRegistry;
+use genpipe::config::PipelineConfig;
+use genpipe::registry::ComponentRegistry;
 
-/// Helix — run any pipeline from a TOML config file.
+/// Genpipe — run any pipeline from a TOML config file.
 #[derive(Parser)]
-#[command(name = "helix", version, about)]
+#[command(name = "genpipe", version, about)]
 struct Cli {
     /// Path to the pipeline TOML config file.
     #[arg(short, long, default_value = "config/pipeline.toml")]

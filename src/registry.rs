@@ -6,9 +6,9 @@
 //! registry to instantiate the corresponding component.
 //!
 //! ```rust,ignore
-//! use helix::registry::ComponentRegistry;
-//! use helix::components::sources::IntervalSource;
-//! use helix::components::sinks::LogSink;
+//! use genpipe::registry::ComponentRegistry;
+//! use genpipe::components::sources::IntervalSource;
+//! use genpipe::components::sinks::LogSink;
 //! use std::time::Duration;
 //!
 //! let mut registry = ComponentRegistry::new();

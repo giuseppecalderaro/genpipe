@@ -47,7 +47,7 @@ impl Sink for LogSink {
 /// Consumes messages with a synchronous closure.
 ///
 /// ```rust,ignore
-/// use helix::components::sinks::FnSink;
+/// use genpipe::components::sinks::FnSink;
 ///
 /// let printer = FnSink::new("print", |msg| {
 ///     println!("{}: {:?}", msg.origin(), msg.payload());
@@ -91,7 +91,7 @@ where
 /// Consumes messages with an async closure.
 ///
 /// ```rust,ignore
-/// use helix::components::sinks::AsyncFnSink;
+/// use genpipe::components::sinks::AsyncFnSink;
 ///
 /// let writer = AsyncFnSink::new("writer", |msg| Box::pin(async move {
 ///     // async I/O here …
